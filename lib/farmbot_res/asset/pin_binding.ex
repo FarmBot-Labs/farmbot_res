@@ -1,0 +1,29 @@
+defmodule FarmbotRes.Asset.PinBinding do
+  @moduledoc """
+  When a pin binding is triggered a sequence fires.
+  """
+  use FarmbotRes.Asset.Schema, path: "/api/pin_bindings"
+
+  schema "pin_bindings" do
+    field(:id, :id)
+    field(:pin_num, :integer)
+    field(:sequence_id, :integer)
+    field(:special_action, :string)
+  end
+
+  def changeset(pin_binding, params \\ %{}) do
+    pin_binding
+    |> cast(params, [:id, :pin_num, :sequence_id, :special_action])
+    |> validate_required([])
+    |> validate_pin_num()
+    |> unique_constraint(:pin_num)
+  end
+
+  def validate_pin_num(changeset) do
+    if get_field(changeset, :pin_num, -1) in [17, 23, 27, 06, 21, 24, 25, 12, 13] do
+      add_error(changeset, :pin_num, "in use")
+    else
+      changeset
+    end
+  end
+end
