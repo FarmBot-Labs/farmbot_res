@@ -1,0 +1,23 @@
+defmodule <%= module_name %> do
+  @moduledoc """
+  """
+
+  use FarmbotRes.Asset.Schema, path: "/api/<%= plural %>"
+
+  schema "<%= plural %>" do
+    field(:id, :id)
+    timestamps()
+  end
+
+  view <%= snake %> do
+    %{
+      id: <%= snake %>.id,
+    }
+  end
+
+  def changeset(<%= snake %>, params \\ %{}) do
+    <%= snake %>
+    |> cast(params, [:id])
+    |> validate_required([])
+  end
+end

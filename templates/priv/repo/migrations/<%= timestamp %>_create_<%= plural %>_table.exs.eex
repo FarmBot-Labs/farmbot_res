@@ -1,0 +1,10 @@
+defmodule <%= migration_module_name %> do
+  use Ecto.Migration
+
+  def change do
+    create table("<%= plural %>", primary_key: false) do
+      add(:local_id, :uuid, primary_key: true)
+      add(:id, :id)
+    end
+  end
+end
