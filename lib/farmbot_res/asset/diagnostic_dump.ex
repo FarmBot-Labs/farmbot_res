@@ -6,6 +6,13 @@ defmodule Elixir.FarmbotRes.Asset.DiagnosticDump do
 
   schema "diagnostic_dumps" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:ticket_identifier, :string)
     field(:fbos_commit, :string)
     field(:fbos_version, :string)
@@ -39,7 +46,9 @@ defmodule Elixir.FarmbotRes.Asset.DiagnosticDump do
       :firmware_commit,
       :firmware_state,
       :network_interface,
-      :fbos_dmesg_dump
+      :fbos_dmesg_dump,
+      :created_at,
+      :updated_at
     ])
     |> validate_required([])
   end

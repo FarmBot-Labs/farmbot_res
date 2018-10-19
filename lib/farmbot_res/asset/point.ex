@@ -6,6 +6,13 @@ defmodule FarmbotRes.Asset.Point do
 
   schema "points" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:meta, :map)
     field(:name, :string)
     field(:plant_stage, :string)
@@ -45,7 +52,9 @@ defmodule FarmbotRes.Asset.Point do
       :radius,
       :x,
       :y,
-      :z
+      :z,
+      :created_at,
+      :updated_at
     ])
     |> validate_required([])
   end

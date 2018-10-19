@@ -98,13 +98,13 @@ defmodule FarmbotRes.API do
 
   @doc "helper for `GET`ing a path."
   def get_body!(path) do
-    API.get!(API.client(), path <> ".json")
+    API.get!(API.client(), path)
     |> Map.fetch!(:body)
   end
 
   @doc "helper for `GET`ing api resources."
   def get_changeset(module) do
-    get_body!(module.path() <> ".json")
+    get_body!(module.path())
     |> case do
       %{} = single ->
         module.changeset(struct(module), single)
@@ -116,7 +116,7 @@ defmodule FarmbotRes.API do
 
   @doc "helper for `GET`ing api resources."
   def get_changeset(module, path) do
-    get_body!(Path.join(module.path(), to_string(path)) <> ".json")
+    get_body!(Path.join(module.path(), to_string(path)))
     |> case do
       %{} = single ->
         module.changeset(struct(module), single)

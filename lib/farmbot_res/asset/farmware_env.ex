@@ -6,6 +6,13 @@ defmodule Elixir.FarmbotRes.Asset.FarmwareEnv do
 
   schema "farmware_envs" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:key, :string)
     field(:value, :string)
     timestamps()
@@ -21,7 +28,7 @@ defmodule Elixir.FarmbotRes.Asset.FarmwareEnv do
 
   def changeset(farmware_env, params \\ %{}) do
     farmware_env
-    |> cast(params, [:id, :key, :value])
+    |> cast(params, [:id, :key, :value, :created_at, :updated_at])
     |> validate_required([])
   end
 end

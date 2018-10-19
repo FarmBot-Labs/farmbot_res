@@ -34,6 +34,13 @@ defmodule FarmbotRes.Asset.Regimen do
 
   schema "regimens" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:name, :string)
     embeds_many(:regimen_items, Item)
     field(:farm_event_id, :integer, virtual: true)
@@ -50,7 +57,7 @@ defmodule FarmbotRes.Asset.Regimen do
 
   def changeset(regimen, params \\ %{}) do
     regimen
-    |> cast(params, [:id, :name])
+    |> cast(params, [:id, :name, :created_at, :updated_at])
     |> cast_embed(:regimen_items)
     |> validate_required([])
   end

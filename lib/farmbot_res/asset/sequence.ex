@@ -7,6 +7,13 @@ defmodule FarmbotRes.Asset.Sequence do
 
   schema "sequences" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:name, :string)
     field(:kind, :string)
     field(:args, :map)
@@ -26,7 +33,7 @@ defmodule FarmbotRes.Asset.Sequence do
 
   def changeset(device, params \\ %{}) do
     device
-    |> cast(params, [:id, :args, :name, :kind, :body])
+    |> cast(params, [:id, :args, :name, :kind, :body, :created_at, :updated_at])
     |> validate_required([])
   end
 end

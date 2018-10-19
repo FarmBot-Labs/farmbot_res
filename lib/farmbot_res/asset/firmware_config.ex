@@ -6,6 +6,13 @@ defmodule Elixir.FarmbotRes.Asset.FirmwareConfig do
 
   schema "firmware_configs" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:pin_guard_4_time_out, :float)
     field(:pin_guard_1_active_state, :float)
     field(:encoder_scaling_y, :float)
@@ -282,7 +289,9 @@ defmodule Elixir.FarmbotRes.Asset.FirmwareConfig do
       :movement_axis_nr_steps_z,
       :encoder_invert_x,
       :encoder_missed_steps_max_x,
-      :movement_invert_motor_y
+      :movement_invert_motor_y,
+      :created_at,
+      :updated_at
     ])
     |> validate_required([])
   end

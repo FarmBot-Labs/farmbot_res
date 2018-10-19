@@ -3,13 +3,13 @@ defmodule FarmbotRes.Repo.Migrations.CreateSequencesTable do
 
   def change do
     create table("sequences", primary_key: false) do
-      add(:local_id, :uuid, primary_key: true)
+      add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:name, :string)
       add(:kind, :string)
       add(:args, :binary)
       add(:body, :binary)
-      timestamps()
+      timestamps(inserted_at: :created_at)
     end
   end
 end

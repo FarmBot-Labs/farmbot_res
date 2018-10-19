@@ -22,5 +22,8 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 farmbot_res-*.tar
 
-# Ignore sqlite databses
+# Ignore sqlite databses.
 *.sqlite
+
+# Ignore SQL schema dumps.
+*.sql

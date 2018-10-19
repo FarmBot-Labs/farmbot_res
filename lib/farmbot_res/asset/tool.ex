@@ -5,6 +5,13 @@ defmodule FarmbotRes.Asset.Tool do
 
   schema "tools" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:name, :string)
     timestamps()
   end
@@ -18,7 +25,7 @@ defmodule FarmbotRes.Asset.Tool do
 
   def changeset(tool, params \\ %{}) do
     tool
-    |> cast(params, [:id, :name])
+    |> cast(params, [:id, :name, :created_at, :updated_at])
     |> validate_required([])
   end
 end

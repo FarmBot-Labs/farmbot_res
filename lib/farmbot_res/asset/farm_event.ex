@@ -6,6 +6,13 @@ defmodule Elixir.FarmbotRes.Asset.FarmEvent do
 
   schema "farm_events" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:end_time, :utc_datetime)
     field(:executable_type, :string)
     field(:executable_id, :id)
@@ -37,7 +44,9 @@ defmodule Elixir.FarmbotRes.Asset.FarmEvent do
       :executable_id,
       :repeat,
       :start_time,
-      :time_unit
+      :time_unit,
+      :created_at,
+      :updated_at
     ])
     |> validate_required([])
   end

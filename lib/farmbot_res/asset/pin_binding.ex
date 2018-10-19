@@ -6,6 +6,13 @@ defmodule FarmbotRes.Asset.PinBinding do
 
   schema "pin_bindings" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:pin_num, :integer)
     field(:sequence_id, :integer)
     field(:special_action, :string)
@@ -23,7 +30,7 @@ defmodule FarmbotRes.Asset.PinBinding do
 
   def changeset(pin_binding, params \\ %{}) do
     pin_binding
-    |> cast(params, [:id, :pin_num, :sequence_id, :special_action])
+    |> cast(params, [:id, :pin_num, :sequence_id, :special_action, :created_at, :updated_at])
     |> validate_required([])
     |> validate_pin_num()
     |> unique_constraint(:pin_num)

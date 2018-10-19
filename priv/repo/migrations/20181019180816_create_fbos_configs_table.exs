@@ -3,9 +3,8 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateFbosConfigsTable do
 
   def change do
     create table("fbos_configs", primary_key: false) do
-      add(:local_id, :uuid, primary_key: true)
+      add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
-
       add(:arduino_debug_messages, :boolean)
       add(:auto_sync, :boolean)
       add(:beta_opt_in, :boolean)
@@ -18,8 +17,7 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateFbosConfigsTable do
       add(:sequence_body_log, :boolean)
       add(:sequence_complete_log, :boolean)
       add(:sequence_init_log, :boolean)
-
-      timestamps()
+      timestamps(inserted_at: :created_at)
     end
   end
 end

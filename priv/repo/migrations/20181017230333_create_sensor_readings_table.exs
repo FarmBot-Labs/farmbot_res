@@ -3,7 +3,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateSensorReadingsTable do
 
   def change do
     create table("sensor_readings", primary_key: false) do
-      add(:local_id, :uuid, primary_key: true)
+      add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:mode, :integer)
       add(:pin, :integer)
@@ -11,8 +11,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateSensorReadingsTable do
       add(:x, :float)
       add(:y, :float)
       add(:z, :float)
-      add(:created_at, :utc_datetime)
-      timestamps()
+      timestamps(inserted_at: :created_at)
     end
   end
 end

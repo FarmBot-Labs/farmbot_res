@@ -6,6 +6,13 @@ defmodule Elixir.FarmbotRes.Asset.FbosConfig do
 
   schema "fbos_configs" do
     field(:id, :id)
+
+    has_one(:local_meta, FarmbotRes.Private.LocalMeta,
+      on_delete: :delete_all,
+      references: :local_id,
+      foreign_key: :asset_local_id
+    )
+
     field(:arduino_debug_messages, :boolean)
     field(:auto_sync, :boolean)
     field(:beta_opt_in, :boolean)
@@ -54,7 +61,9 @@ defmodule Elixir.FarmbotRes.Asset.FbosConfig do
       :os_auto_update,
       :sequence_body_log,
       :sequence_complete_log,
-      :sequence_init_log
+      :sequence_init_log,
+      :created_at,
+      :updated_at
     ])
     |> validate_required([])
   end

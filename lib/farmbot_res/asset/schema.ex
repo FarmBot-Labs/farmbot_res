@@ -17,6 +17,7 @@ defmodule FarmbotRes.Asset.Schema do
       @doc "Path on the Farmbot Web API"
       def path, do: Keyword.fetch!(unquote(opts), :path)
       @primary_key {:local_id, :binary_id, autogenerate: true}
+      @timestamps_opts inserted_at: :created_at
     end
   end
 end

@@ -3,7 +3,7 @@ defmodule FarmbotRes.Repo.Migrations.CreatePointsTable do
 
   def change do
     create table("points", primary_key: false) do
-      add(:local_id, :uuid, primary_key: true)
+      add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:meta, :map)
       add(:name, :string)
@@ -14,7 +14,7 @@ defmodule FarmbotRes.Repo.Migrations.CreatePointsTable do
       add(:x, :integer)
       add(:y, :integer)
       add(:z, :integer)
-      timestamps()
+      timestamps(inserted_at: :created_at)
     end
   end
 end

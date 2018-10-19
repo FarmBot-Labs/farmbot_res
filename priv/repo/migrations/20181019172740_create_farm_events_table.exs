@@ -3,7 +3,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateFarmEventsTable do
 
   def change do
     create table("farm_events", primary_key: false) do
-      add(:local_id, :uuid, primary_key: true)
+      add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:end_time, :utc_datetime)
       add(:executable_type, :string)
@@ -11,6 +11,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateFarmEventsTable do
       add(:repeat, :integer)
       add(:start_time, :utc_datetime)
       add(:time_unit, :string)
+      timestamps(inserted_at: :created_at)
     end
   end
 end

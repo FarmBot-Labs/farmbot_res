@@ -3,11 +3,11 @@ defmodule FarmbotRes.Repo.Migrations.CreateDevicesTable do
 
   def change do
     create table("devices", primary_key: false) do
-      add(:local_id, :id, primary_key: true)
+      add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:name, :string)
       add(:timezone, :string)
-      timestamps()
+      timestamps(inserted_at: :created_at)
     end
   end
 end

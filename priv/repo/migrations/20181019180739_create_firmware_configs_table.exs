@@ -3,7 +3,7 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateFirmwareConfigsTable do
 
   def change do
     create table("firmware_configs", primary_key: false) do
-      add(:local_id, :uuid, primary_key: true)
+      add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:pin_guard_4_time_out, :float)
       add(:pin_guard_1_active_state, :float)
@@ -93,7 +93,7 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateFirmwareConfigsTable do
       add(:encoder_invert_x, :float)
       add(:encoder_missed_steps_max_x, :float)
       add(:movement_invert_motor_y, :float)
-      timestamps()
+      timestamps(inserted_at: :created_at)
     end
   end
 end

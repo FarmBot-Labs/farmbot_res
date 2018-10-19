@@ -3,7 +3,7 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateDiagnosticDumpsTable do
 
   def change do
     create table("diagnostic_dumps", primary_key: false) do
-      add(:local_id, :uuid, primary_key: true)
+      add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:ticket_identifier, :string)
       add(:fbos_commit, :string)
@@ -12,7 +12,7 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateDiagnosticDumpsTable do
       add(:firmware_state, :string)
       add(:network_interface, :string)
       add(:fbos_dmesg_dump, :string)
-      timestamps()
+      timestamps(inserted_at: :created_at)
     end
   end
 end

@@ -1,5 +1,5 @@
 defmodule FarmbotRes.API.DirtyWorker do
-  alias FarmbotRes.{Asset, Repo}
+  alias FarmbotRes.{Private, Repo}
   alias FarmbotRes.API
   import API.View, only: [render: 2]
 
@@ -16,8 +16,9 @@ defmodule FarmbotRes.API.DirtyWorker do
 
   @impl GenServer
   def handle_info(:timeout, %{module: module} = state) do
-    dirty = Asset.list_dirty(module)
-    {:noreply, state, {:continue, dirty}}
+    dirty = Private.list_dirty(module)
+    local = Private.list_local(module)
+    {:noreply, state, {:continue, dirty ++ local}}
   end
 
   @impl GenServer
@@ -26,22 +27,24 @@ defmodule FarmbotRes.API.DirtyWorker do
   end
 
   def handle_continue([dirty | rest], %{module: module} = state) do
-    path = module.path()
-
-    data = render(state.module, dirty)
-
-    case API.post(API.client(), path, data) do
+    case http_request(dirty, state) do
       # Valid data
       {:ok, %{status: s, body: body}} when s > 199 and s < 300 ->
         dirty |> module.changeset(body) |> handle_changeset(rest, state)
 
       # Invalid data
-      {:ok, %{status: s, body: body}} when s > 399 and s < 500 ->
+      {:ok, %{status: s, body: %{} = body}} when s > 399 and s < 500 ->
         changeset = module.changeset(dirty)
 
         Enum.reduce(body, changeset, fn {key, val}, changeset ->
           Ecto.Changeset.add_error(changeset, key, val)
         end)
+        |> handle_changeset(rest, state)
+
+      # Invalid data, but the API didn't say why
+      {:ok, %{status: s, body: _body}} when s > 399 and s < 500 ->
+        module.changeset(dirty)
+        |> Map.put(:valid?, false)
         |> handle_changeset(rest, state)
 
       # HTTP Error. (500, network error, timeout etc.)
@@ -52,8 +55,11 @@ defmodule FarmbotRes.API.DirtyWorker do
 
   # If the changeset was valid, update the record.
   def handle_changeset(%{valid?: true} = changeset, rest, state) do
-    Logger.debug("Successfully synced: #{state.module}", changeset: changeset)
-    _ = Repo.update!(changeset)
+    Logger.info("Successfully synced: #{state.module}", changeset: changeset)
+
+    Repo.update!(changeset)
+    |> Private.mark_clean!()
+
     {:noreply, state, {:continue, rest}}
   end
 
@@ -68,6 +74,18 @@ defmodule FarmbotRes.API.DirtyWorker do
     Logger.error("Failed to sync: #{state.module} #{message}", changeset: changeset)
     _ = Repo.delete!(data)
     {:noreply, state, {:continue, rest}}
+  end
+
+  defp http_request(%{id: nil} = dirty, state) do
+    path = state.module.path()
+    data = render(state.module, dirty)
+    API.post(API.client(), path, data)
+  end
+
+  defp http_request(dirty, state) do
+    path = state.module.path()
+    data = render(state.module, dirty)
+    API.patch(API.client(), path, data)
   end
 
   @doc "Defines a child_spec and start_link/1 function"
