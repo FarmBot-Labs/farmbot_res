@@ -7,7 +7,8 @@ defmodule FarmbotRes.API.DirtyWorker.Supervisor do
 
   def init([]) do
     children = [
-      FarmbotRes.API.DirtyWorker.SensorValue
+      FarmbotRes.API.DirtyWorker.SensorReading,
+      FarmbotRes.API.DirtyWorker.Point
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
