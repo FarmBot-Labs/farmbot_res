@@ -9,6 +9,13 @@ defmodule FarmbotRes.Asset.Tool do
     timestamps()
   end
 
+  view tool do
+    %{
+      id: tool.id,
+      name: tool.name
+    }
+  end
+
   def changeset(tool, params \\ %{}) do
     tool
     |> cast(params, [:id, :name])

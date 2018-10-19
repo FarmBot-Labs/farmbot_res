@@ -9,6 +9,15 @@ defmodule FarmbotRes.Asset.Regimen do
     use Ecto.Schema
 
     @primary_key false
+    @behaviour FarmbotRes.API.View
+    import FarmbotRes.API.View, only: [view: 2]
+
+    view regimen_item do
+      %{
+        time_offset: regimen_item.time_offset,
+        sequence_id: regimen_item.sequence_id
+      }
+    end
 
     embedded_schema do
       field(:time_offset, :integer)
@@ -26,9 +35,17 @@ defmodule FarmbotRes.Asset.Regimen do
   schema "regimens" do
     field(:id, :id)
     field(:name, :string)
+    embeds_many(:regimen_items, Item)
     field(:farm_event_id, :integer, virtual: true)
     timestamps()
-    embeds_many(:regimen_items, Item)
+  end
+
+  view regimen do
+    %{
+      id: regimen.id,
+      name: regimen.name,
+      regimen_items: Enum.map(regimen.items, &Item.render(&1))
+    }
   end
 
   def changeset(regimen, params \\ %{}) do

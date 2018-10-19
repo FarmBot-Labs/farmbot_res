@@ -13,6 +13,14 @@ defmodule FarmbotRes.Asset.Device do
     timestamps()
   end
 
+  view device do
+    %{
+      id: device.id,
+      name: device.name,
+      timezone: device.timezone
+    }
+  end
+
   def changeset(device, params \\ %{}) do
     device
     |> cast(params, [:id, :name, :timezone])

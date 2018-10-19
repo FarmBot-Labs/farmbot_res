@@ -10,6 +10,9 @@ defmodule FarmbotRes.Asset.Schema do
       import Ecto.Changeset
 
       @behaviour FarmbotRes.Asset
+      @behaviour FarmbotRes.API.View
+
+      import FarmbotRes.API.View, only: [view: 2]
 
       @doc "Path on the Farmbot Web API"
       def path, do: Keyword.fetch!(unquote(opts), :path)

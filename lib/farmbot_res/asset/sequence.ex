@@ -14,6 +14,16 @@ defmodule FarmbotRes.Asset.Sequence do
     timestamps()
   end
 
+  view sequence do
+    %{
+      id: sequence.id,
+      name: sequence.name,
+      kind: sequence.kind,
+      args: sequence.args,
+      body: sequence.body
+    }
+  end
+
   def changeset(device, params \\ %{}) do
     device
     |> cast(params, [:id, :args, :name, :kind, :body])

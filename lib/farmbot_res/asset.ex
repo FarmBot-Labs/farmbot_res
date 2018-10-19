@@ -6,7 +6,6 @@ defmodule FarmbotRes.Asset do
   @callback changeset(map, map) :: Ecto.Changeset.t()
 
   alias FarmbotRes.Repo
-  alias FarmbotRes.Asset.SensorReading
 
   import Ecto.Query, warn: false
   import Ecto.Changeset, warn: false

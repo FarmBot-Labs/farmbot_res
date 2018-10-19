@@ -9,6 +9,16 @@ defmodule FarmbotRes.Asset.PinBinding do
     field(:pin_num, :integer)
     field(:sequence_id, :integer)
     field(:special_action, :string)
+    timestamps()
+  end
+
+  view pin_binding do
+    %{
+      id: pin_binding.id,
+      pin_num: pin_binding.pin_num,
+      sequence_id: pin_binding.sequence_id,
+      special_action: pin_binding.special_action
+    }
   end
 
   def changeset(pin_binding, params \\ %{}) do

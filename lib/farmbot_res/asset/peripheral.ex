@@ -13,6 +13,15 @@ defmodule FarmbotRes.Asset.Peripheral do
     timestamps()
   end
 
+  view peripheral do
+    %{
+      id: peripheral.id,
+      pin: peripheral.pin,
+      mode: peripheral.mode,
+      label: peripheral.label
+    }
+  end
+
   def changeset(peripheral, params \\ %{}) do
     peripheral
     |> cast(params, [:id, :pin, :mode, :label])

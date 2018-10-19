@@ -6,10 +6,20 @@ defmodule FarmbotRes.Asset.Sensor do
   use FarmbotRes.Asset.Schema, path: "/api/sensors"
 
   schema "sensors" do
+    field(:id, :id)
     field(:pin, :integer)
     field(:mode, :integer)
     field(:label, :string)
     timestamps()
+  end
+
+  view sensor do
+    %{
+      id: sensor.id,
+      pin: sensor.pin,
+      mode: sensor.mode,
+      label: sensor.label
+    }
   end
 
   def changeset(sensor, params \\ %{}) do

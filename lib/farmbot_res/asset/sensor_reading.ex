@@ -17,6 +17,19 @@ defmodule FarmbotRes.Asset.SensorReading do
     timestamps()
   end
 
+  view sensor_reading do
+    %{
+      id: sensor_reading.id,
+      mode: sensor_reading.mode,
+      pin: sensor_reading.pin,
+      value: sensor_reading.value,
+      x: sensor_reading.x,
+      y: sensor_reading.y,
+      z: sensor_reading.z,
+      created_at: sensor_reading.created_at
+    }
+  end
+
   def changeset(sensor, params \\ %{}) do
     sensor
     |> cast(params, [:id, :mode, :pin, :value, :x, :y, :z, :created_at])
