@@ -24,7 +24,6 @@ defmodule FarmbotRes.MixProject do
   defp deps do
     [
       {:sqlite_ecto2, "~> 2.3"},
-      {:postgrex, "~> 0.13.5"},
       {:tesla, "~> 1.1"},
       {:jason, "~> 1.1"}
     ]
