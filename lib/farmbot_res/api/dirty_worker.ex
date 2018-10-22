@@ -1,4 +1,5 @@
 defmodule FarmbotRes.API.DirtyWorker do
+  @moduledoc "Handles uploading/downloading of data from the API."
   alias FarmbotRes.{Private, Repo}
   alias FarmbotRes.API
   import API.View, only: [render: 2]
@@ -6,6 +7,22 @@ defmodule FarmbotRes.API.DirtyWorker do
   require Logger
   use GenServer
   @timeout 10000
+
+  @doc false
+  def child_spec(module) when is_atom(module) do
+    %{
+      id: {FarmbotRes.API.DirtyWorker, module},
+      start: {__MODULE__, :start_link, [[module: module, timeout: @timeout]]},
+      type: :worker,
+      restart: :permanent,
+      shutdown: 500
+    }
+  end
+
+  @doc "Start an instance of a DirtyWorker"
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args)
+  end
 
   @impl GenServer
   def init(args) do
@@ -64,6 +81,7 @@ defmodule FarmbotRes.API.DirtyWorker do
   end
 
   # If the changeset was invalid, delete the record.
+  # TODO(Connor) - Update the dirty field here, upload to rollbar?
   def handle_changeset(%{valid?: false, data: data} = changeset, rest, state) do
     message =
       Enum.map(changeset.errors, fn {key, val} ->
@@ -86,27 +104,5 @@ defmodule FarmbotRes.API.DirtyWorker do
     path = state.module.path()
     data = render(state.module, dirty)
     API.patch(API.client(), path, data)
-  end
-
-  @doc "Defines a child_spec and start_link/1 function"
-  defmacro __using__(module) do
-    quote do
-      @doc false
-      def child_spec(opts) do
-        %{
-          id: {FarmbotRes.API.DirtyWorker, unquote(module)},
-          start: {__MODULE__, :start_link, [opts]},
-          type: :worker,
-          restart: :permanent,
-          shutdown: 500
-        }
-      end
-
-      @doc "Start an instance of a DirtyWorker"
-      def start_link(args) do
-        args = Keyword.merge(args, module: unquote(module))
-        GenServer.start_link(FarmbotRes.API.DirtyWorker, args)
-      end
-    end
   end
 end

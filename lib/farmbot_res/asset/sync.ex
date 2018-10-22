@@ -25,8 +25,12 @@ defmodule Elixir.FarmbotRes.Asset.Sync do
     end
 
     def changeset(item, params \\ %{})
+
     def changeset(item, [id, updated_at]) do
-      params = %{id: id, updated_at: updated_at}
+      changeset(item, %{id: id, updated_at: updated_at})
+    end
+
+    def changeset(item, params) do
       item
       |> cast(params, [:id, :updated_at])
       |> validate_required([])
@@ -34,10 +38,9 @@ defmodule Elixir.FarmbotRes.Asset.Sync do
   end
 
   schema "syncs" do
-    timestamps()
-    embeds_one(:device, Item)
-    embeds_one(:firmware_config, Item)
-    embeds_one(:fbos_config, Item)
+    embeds_many(:devices, Item)
+    embeds_many(:firmware_configs, Item)
+    embeds_many(:fbos_configs, Item)
     embeds_many(:diagnostic_dumps, Item)
     embeds_many(:farm_events, Item)
     embeds_many(:farmware_envs, Item)
@@ -50,14 +53,15 @@ defmodule Elixir.FarmbotRes.Asset.Sync do
     embeds_many(:sensors, Item)
     embeds_many(:sequences, Item)
     embeds_many(:tools, Item)
-    field(:now, :naive_datetime)
+    field(:now, :utc_datetime)
+    timestamps()
   end
 
   view sync do
     %{
-      device: Item.render(sync.device),
-      fbos_config: Item.render(sync.fbos_config),
-      firmware_config: Item.render(sync.firmware_config),
+      devices: Enum.map(sync.device, &Item.render/1),
+      fbos_configs: Enum.map(sync.fbos_config, &Item.render/1),
+      firmware_configs: Enum.map(sync.firmware_config, &Item.render/1),
       diagnostic_dumps: Enum.map(sync.diagnostic_dumps, &Item.render/1),
       farm_events: Enum.map(sync.farm_events, &Item.render/1),
       farmware_envs: Enum.map(sync.farmware_envs, &Item.render/1),
@@ -77,9 +81,9 @@ defmodule Elixir.FarmbotRes.Asset.Sync do
   def changeset(sync, params \\ %{}) do
     sync
     |> cast(params, [:now])
-    |> cast_embed(:device)
-    |> cast_embed(:fbos_config)
-    |> cast_embed(:firmware_config)
+    |> cast_embed(:devices)
+    |> cast_embed(:fbos_configs)
+    |> cast_embed(:firmware_configs)
     |> cast_embed(:diagnostic_dumps)
     |> cast_embed(:farm_events)
     |> cast_embed(:farmware_envs)
