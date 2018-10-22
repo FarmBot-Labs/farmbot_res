@@ -11,7 +11,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateSensorReadingsTable do
       add(:x, :float)
       add(:y, :float)
       add(:z, :float)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

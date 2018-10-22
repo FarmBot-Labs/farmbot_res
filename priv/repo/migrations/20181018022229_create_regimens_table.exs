@@ -7,7 +7,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateRegimensTable do
       add(:id, :id)
       add(:regimen_items, {:array, :map})
       add(:name, :string)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

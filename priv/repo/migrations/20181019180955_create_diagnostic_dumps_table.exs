@@ -12,7 +12,7 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateDiagnosticDumpsTable do
       add(:firmware_state, :string)
       add(:network_interface, :string)
       add(:fbos_dmesg_dump, :string)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

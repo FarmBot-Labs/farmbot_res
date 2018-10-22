@@ -14,7 +14,7 @@ defmodule FarmbotRes.Repo.Migrations.CreatePointsTable do
       add(:x, :integer)
       add(:y, :integer)
       add(:z, :integer)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

@@ -8,7 +8,7 @@ defmodule FarmbotRes.Repo.Migrations.CreatePeripheralsTable do
       add(:pin, :integer)
       add(:mode, :integer)
       add(:label, :string)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

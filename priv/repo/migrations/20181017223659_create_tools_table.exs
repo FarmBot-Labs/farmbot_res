@@ -6,7 +6,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateToolsTable do
       add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:name, :string)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

@@ -7,7 +7,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateDevicesTable do
       add(:id, :id)
       add(:name, :string)
       add(:timezone, :string)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

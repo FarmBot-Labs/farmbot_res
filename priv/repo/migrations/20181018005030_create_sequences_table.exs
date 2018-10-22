@@ -9,7 +9,7 @@ defmodule FarmbotRes.Repo.Migrations.CreateSequencesTable do
       add(:kind, :string)
       add(:args, :binary)
       add(:body, :binary)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

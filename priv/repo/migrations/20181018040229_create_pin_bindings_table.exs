@@ -8,7 +8,7 @@ defmodule FarmbotRes.Repo.Migrations.CreatePinBindingsTable do
       add(:pin_num, :integer)
       add(:sequence_id, :integer)
       add(:special_action, :string)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

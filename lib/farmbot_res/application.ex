@@ -7,7 +7,7 @@ defmodule FarmbotRes.Application do
 
   def start(_type, _args) do
     children = [
-      FarmbotRes.Repo,
+      FarmbotRes.Repo
       # FarmbotRes.API.DirtyWorker.Supervisor
     ]
 

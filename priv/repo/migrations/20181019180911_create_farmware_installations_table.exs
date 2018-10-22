@@ -6,7 +6,7 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateFarmwareInstallationsTable do
       add(:local_id, :binary_id, primary_key: true)
       add(:id, :id)
       add(:url, :string)
-      timestamps(inserted_at: :created_at)
+      timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end
 end

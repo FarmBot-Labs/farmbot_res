@@ -13,16 +13,18 @@ defmodule FarmbotRes.Private do
   @doc "Lists `module` objects that have a `local_meta` object"
   def list_dirty(module) do
     table = table(module)
-    q = from lm in LocalMeta, where: lm.table == ^table, select: lm.asset_local_id
-    Repo.all(from data in module, join: lm in subquery(q))
+    q = from(lm in LocalMeta, where: lm.table == ^table, select: lm.asset_local_id)
+    Repo.all(from(data in module, join: lm in subquery(q)))
   end
 
   @doc "Mark a document as `dirty` by creating a `local_meta` object"
   def mark_dirty!(asset, params) do
     table = table(asset)
+
     local_meta =
-      Repo.one(from(lm in LocalMeta, where: lm.asset_local_id == ^asset.local_id and lm.table == ^table)) ||
-        Ecto.build_assoc(asset, :local_meta)
+      Repo.one(
+        from(lm in LocalMeta, where: lm.asset_local_id == ^asset.local_id and lm.table == ^table)
+      ) || Ecto.build_assoc(asset, :local_meta)
 
     local_meta
     |> LocalMeta.changeset(Map.merge(params, %{table: table, status: "dirty"}))
