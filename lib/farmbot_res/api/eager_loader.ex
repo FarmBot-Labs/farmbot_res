@@ -4,14 +4,22 @@ defmodule FarmbotRes.API.EagerLoader do
   require Logger
   use GenServer
 
+  @doc "Get a Changeset by module and id. May return nil."
   def get_cache(module, id) do
     pid(module)
     |> GenServer.call({:get_cache, id})
   end
 
+  @doc """
+  Cache a Changeset.
+  This Changeset _must_ be complete. This includes:
+    * Existing data if this is an update
+    * a remote `id` field.
+  """
   def cache(%Changeset{data: %module{}} = changeset) do
     id = Changeset.get_field(changeset, :id)
     id || raise("Can't cache changeset with no id.")
+
     pid(module)
     |> GenServer.cast({:cache, id, changeset})
   end
@@ -34,6 +42,7 @@ defmodule FarmbotRes.API.EagerLoader do
     }
   end
 
+  @doc false
   def start_link(args) do
     GenServer.start_link(__MODULE__, args)
   end

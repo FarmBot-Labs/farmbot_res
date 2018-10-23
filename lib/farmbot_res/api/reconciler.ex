@@ -1,4 +1,7 @@
 defmodule FarmbotRes.API.Reconciler do
+  @moduledoc """
+  Handles remote additions and changes.
+  """
   require Logger
   alias Ecto.{Changeset, Multi}
   import Ecto.Query
@@ -7,6 +10,16 @@ defmodule FarmbotRes.API.Reconciler do
   alias FarmbotRes.Asset.Sync
   alias API.{SyncGroup, EagerLoader}
 
+  @doc """
+  Reconcile remote updates. The following steps are wrapped in a tranaction
+  that is treated as an `all or nothing` sync.
+
+  * get sync object from API
+  * start a new Transaction
+    * `sync_group` for groups 1-4, aborting the transaction if there are failures.
+  * add the `sync` to the Transaction
+  * apply the Transaction.
+  """
   def sync do
     Logger.configure(level: :info)
     # Get the sync changeset
@@ -15,7 +28,8 @@ defmodule FarmbotRes.API.Reconciler do
 
     multi = Multi.new()
 
-    with {:ok, multi} <- sync_group(multi, sync, SyncGroup.group_1()),
+    with {:ok, multi} <- sync_group(multi, sync, SyncGroup.group_0()),
+         {:ok, multi} <- sync_group(multi, sync, SyncGroup.group_1()),
          {:ok, multi} <- sync_group(multi, sync, SyncGroup.group_2()),
          {:ok, multi} <- sync_group(multi, sync, SyncGroup.group_3()),
          {:ok, multi} <- sync_group(multi, sync, SyncGroup.group_4()) do
@@ -24,6 +38,20 @@ defmodule FarmbotRes.API.Reconciler do
     end
   end
 
+  @doc """
+  Sync a group (list) of modules into a transaction.
+  For each item in the `sync` object, belonging to a `module` does the following:
+
+  * checks EagerLoader cache
+  * if no cache exists:
+    * downloads changeset via HTTP
+  * if cache exists:
+    * check if cache matches data on the `sync` object
+      * if cache is valid: uses cached changeset
+      * if cache is _not_ valid, falls back to http
+  * applies changeset if there was any changes from cache or http
+
+  """
   def sync_group(multi, sync, [module | rest]) do
     table = module.__schema__(:source) |> String.to_atom()
     items = Map.fetch!(sync, table)
@@ -50,9 +78,11 @@ defmodule FarmbotRes.API.Reconciler do
 
       %{} ->
         case get_changeset(local_item, item, cached_cs) do
-          %Changeset{} = cs -> Multi.update(multi, {table, item.id}, cs)
+          %Changeset{} = cs ->
+            Multi.update(multi, {table, item.id}, cs)
+
           nil ->
-            Logger.info "Local data: #{local_item.__struct__} is current."
+            Logger.info("Local data: #{local_item.__struct__} is current.")
             multi
         end
     end
@@ -66,7 +96,10 @@ defmodule FarmbotRes.API.Reconciler do
   defp get_changeset(local_item, sync_item, nil) do
     # Check if remote data is newer
     if DateTime.compare(sync_item.updated_at, local_item.updated_at) == :gt do
-      Logger.info "Local data: #{local_item.__struct__} is out of date. Using HTTP to get newer data."
+      Logger.info(
+        "Local data: #{local_item.__struct__} is out of date. Using HTTP to get newer data."
+      )
+
       API.get_changeset(local_item, "#{sync_item.id}")
     end
   end
@@ -78,13 +111,17 @@ defmodule FarmbotRes.API.Reconciler do
   # if the cache is not the same `updated_at` as the API, fallback to HTTP.
   defp get_changeset(local_item, sync_item, %Changeset{} = cached) do
     cached_updated_at = Changeset.get_field(cached, :updated_at)
+
     if DateTime.compare(sync_item.updated_at, cached_updated_at) == :eq do
       if DateTime.compare(cached_updated_at, local_item.updated_at) == :gt do
-        Logger.info "Local data: #{local_item.__struct__} is out of date. Using cache do get newer data."
+        Logger.info(
+          "Local data: #{local_item.__struct__} is out of date. Using cache do get newer data."
+        )
+
         cached
       end
     else
-      Logger.info "Cached item is out of date"
+      Logger.info("Cached item is out of date")
       get_changeset(local_item, sync_item, nil)
     end
   end

@@ -43,7 +43,7 @@ defmodule FarmbotRes.API.SyncGroup do
   def group_2,
     do: [
       # Requires Peripheral, Point, Sensor, SensorReading, Tool
-      # Sequence
+      Sequence
     ]
 
   @doc "Group 3 relies on assets in Group 3"
