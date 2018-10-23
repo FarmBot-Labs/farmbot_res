@@ -18,13 +18,14 @@ defmodule FarmbotRes.API.SyncGroup do
     Tool
   }
 
+  def all_groups, do: group_0() ++ group_1() ++ group_2() ++ group_3() ++ group_4()
+
   @doc "Assets in Group 0 are required for FarmBot to operate."
   def group_0,
     do: [
       Device,
       FbosConfig,
-      FirmwareConfig,
-      Sync
+      FirmwareConfig
     ]
 
   @doc "Group 1 should have no external requirements"

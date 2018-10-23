@@ -53,42 +53,57 @@ defmodule FarmbotRes.API.Reconciler do
 
   """
   def sync_group(multi, sync, [module | rest]) do
+    multi
+    |> do_sync_group(sync, module)
+    |> sync_group(sync, rest)
+  end
+
+  def sync_group(multi, _sync, []), do: {:ok, multi}
+
+  defp do_sync_group(multi, sync, module) do
     table = module.__schema__(:source) |> String.to_atom()
     items = Map.fetch!(sync, table)
 
     # TODO(Connor) make this reduce async with Task/Agent
-    multi = Enum.reduce(items, multi, &multi_reduce(module, table, &1, &2))
-
-    sync_group(multi, sync, rest)
+    Enum.reduce(items, multi, &multi_reduce(module, table, &1, &2))
   end
-
-  def sync_group(multi, _sync, []), do: {:ok, multi}
 
   @doc false
   def multi_reduce(module, table, item, multi) do
     cached_cs = EagerLoader.get_cache(module, item.id)
     local_item = Repo.one(from(d in module, where: d.id == ^item.id))
 
-    case local_item do
-      nil ->
-        Logger.info("local version doesn't exist. downloading: #{module} => #{inspect(item)}")
-
-        cs = API.get_changeset(module, "#{item.id}")
+    case get_changeset(local_item || module, item, cached_cs) do
+      {:insert, %Changeset{} = cs} ->
         Multi.insert(multi, {table, item.id}, cs)
 
-      %{} ->
-        case get_changeset(local_item, item, cached_cs) do
-          %Changeset{} = cs ->
-            Multi.update(multi, {table, item.id}, cs)
+      {:update, %Changeset{} = cs} ->
+        Multi.update(multi, {table, item.id}, cs)
 
-          nil ->
-            Logger.info("Local data: #{local_item.__struct__} is current.")
-            multi
-        end
+      nil ->
+        Logger.info("Local data: #{local_item.__struct__} is current.")
+        multi
     end
   end
 
   defp get_changeset(local_item, sync_item, cached_cs)
+
+  # A module is passed in if there is no local copy of the data.
+  defp get_changeset(module, sync_item, nil) when is_atom(module) do
+    Logger.info("Local data: #{module} does not exist. Using HTTP to get data.")
+    {:insert, API.get_changeset(module, "#{sync_item.id}")}
+  end
+
+  defp get_changeset(module, sync_item, cached) when is_atom(module) do
+    cached_updated_at = Changeset.get_field(cached, :updated_at)
+
+    if DateTime.compare(sync_item.updated_at, cached_updated_at) == :eq do
+      {:insert, cached}
+    else
+      Logger.info("Cached item is out of date")
+      get_changeset(module, sync_item, nil)
+    end
+  end
 
   # no cache available
   # If the `sync_item.updated_at` is newer than `local_item.updated_at`
@@ -100,7 +115,7 @@ defmodule FarmbotRes.API.Reconciler do
         "Local data: #{local_item.__struct__} is out of date. Using HTTP to get newer data."
       )
 
-      API.get_changeset(local_item, "#{sync_item.id}")
+      {:update, API.get_changeset(local_item, "#{sync_item.id}")}
     end
   end
 
@@ -118,7 +133,7 @@ defmodule FarmbotRes.API.Reconciler do
           "Local data: #{local_item.__struct__} is out of date. Using cache do get newer data."
         )
 
-        cached
+        {:update, cached}
       end
     else
       Logger.info("Cached item is out of date")

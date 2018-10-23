@@ -42,7 +42,7 @@ defmodule FarmbotRes.Asset.Regimen do
     )
 
     field(:name, :string)
-    embeds_many(:regimen_items, Item)
+    embeds_many(:regimen_items, Item, on_replace: :delete)
     field(:farm_event_id, :integer, virtual: true)
     timestamps()
   end
