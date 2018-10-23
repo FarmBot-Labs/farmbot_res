@@ -11,9 +11,9 @@ defmodule FarmbotRes.Repo.Migrations.CreatePointsTable do
       add(:planted_at, :utc_datetime)
       add(:pointer_type, :string)
       add(:radius, :float)
-      add(:x, :integer)
-      add(:y, :integer)
-      add(:z, :integer)
+      add(:x, :float)
+      add(:y, :float)
+      add(:z, :float)
       timestamps(inserted_at: :created_at, type: :utc_datetime)
     end
   end

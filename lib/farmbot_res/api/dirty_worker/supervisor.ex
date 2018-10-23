@@ -1,24 +1,48 @@
 defmodule FarmbotRes.API.DirtyWorker.Supervisor do
-  use DynamicSupervisor
+  use Supervisor
   alias FarmbotRes.API.DirtyWorker
-  # alias FarmbotRes.Asset.{
-  #   FbosConfig,
-  #   FirmwareConfig
-  # }
+
+  alias FarmbotRes.Asset.{
+    Device,
+    DiagnosticDump,
+    FarmEvent,
+    FarmwareEnv,
+    FarmwareInstallation,
+    FbosConfig,
+    FirmwareConfig,
+    Peripheral,
+    PinBinding,
+    Point,
+    Regimen,
+    SensorReading,
+    Sensor,
+    Sequence,
+    Tool
+  }
 
   def start_link(args) do
-    DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
-  end
-
-  def start_worker(module) when is_atom(module) do
-    spec = {DirtyWorker, module}
-    DynamicSupervisor.start_child(__MODULE__, spec)
+    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   def init(_args) do
-    DynamicSupervisor.init(
-      strategy: :one_for_one
-      # extra_arguments: args
-    )
+    children = [
+      {DirtyWorker, Device},
+      {DirtyWorker, DiagnosticDump},
+      {DirtyWorker, FarmEvent},
+      {DirtyWorker, FarmwareEnv},
+      {DirtyWorker, FarmwareInstallation},
+      {DirtyWorker, FbosConfig},
+      {DirtyWorker, FirmwareConfig},
+      {DirtyWorker, Peripheral},
+      {DirtyWorker, PinBinding},
+      {DirtyWorker, Point},
+      {DirtyWorker, Regimen},
+      {DirtyWorker, SensorReading},
+      {DirtyWorker, Sensor},
+      {DirtyWorker, Sequence},
+      {DirtyWorker, Tool}
+    ]
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end

@@ -26,6 +26,7 @@ defmodule FarmbotRes.API.DirtyWorker do
 
   @impl GenServer
   def init(args) do
+    Logger.disable(self())
     module = Keyword.fetch!(args, :module)
     timeout = Keyword.get(args, :timeout, @timeout)
     {:ok, %{module: module, timeout: timeout}, timeout}

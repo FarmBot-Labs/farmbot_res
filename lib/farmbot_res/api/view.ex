@@ -6,7 +6,7 @@ defmodule FarmbotRes.API.View do
   @spec render(module, map) :: map
   def render(module, object), do: module.render(object)
 
-  @doc "Helper to define a `view/1` function"
+  @doc "Helper to define a `render/1` function"
   defmacro view(data, block) do
     quote do
       def render(unquote(data)), unquote(block)

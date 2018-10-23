@@ -4,13 +4,13 @@ defmodule Elixir.FarmbotRes.Repo.Migrations.CreateSyncsTable do
   def change do
     create table("syncs", primary_key: false) do
       add(:local_id, :binary_id, primary_key: true)
-      add(:device, {:array, :map})
+      add(:devices, {:array, :map})
       add(:diagnostic_dumps, {:array, :map})
       add(:farm_events, {:array, :map})
       add(:farmware_envs, {:array, :map})
       add(:farmware_installations, {:array, :map})
-      add(:fbos_config, {:array, :map})
-      add(:firmware_config, {:array, :map})
+      add(:fbos_configs, {:array, :map})
+      add(:firmware_configs, {:array, :map})
       add(:peripherals, {:array, :map})
       add(:pin_bindings, {:array, :map})
       add(:points, {:array, :map})

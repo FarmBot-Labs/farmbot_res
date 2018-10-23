@@ -19,9 +19,9 @@ defmodule FarmbotRes.Asset.Point do
     field(:planted_at, :utc_datetime)
     field(:pointer_type, :string)
     field(:radius, :float)
-    field(:x, :integer)
-    field(:y, :integer)
-    field(:z, :integer)
+    field(:x, :float)
+    field(:y, :float)
+    field(:z, :float)
     timestamps()
   end
 
