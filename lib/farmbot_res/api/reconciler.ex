@@ -21,7 +21,6 @@ defmodule FarmbotRes.API.Reconciler do
   * apply the Transaction.
   """
   def sync do
-    Logger.configure(level: :info)
     # Get the sync changeset
     sync_changeset = API.get_changeset(Sync)
     sync = Changeset.apply_changes(sync_changeset)
@@ -75,9 +74,11 @@ defmodule FarmbotRes.API.Reconciler do
 
     case get_changeset(local_item || module, item, cached_cs) do
       {:insert, %Changeset{} = cs} ->
+        Logger.info("insert: #{inspect(cs)}")
         Multi.insert(multi, {table, item.id}, cs)
 
       {:update, %Changeset{} = cs} ->
+        Logger.info("update: #{inspect(cs)}")
         Multi.update(multi, {table, item.id}, cs)
 
       nil ->
@@ -94,7 +95,7 @@ defmodule FarmbotRes.API.Reconciler do
     {:insert, API.get_changeset(module, "#{sync_item.id}")}
   end
 
-  defp get_changeset(module, sync_item, cached) when is_atom(module) do
+  defp get_changeset(module, sync_item, %Changeset{} = cached) when is_atom(module) do
     cached_updated_at = Changeset.get_field(cached, :updated_at)
 
     if DateTime.compare(sync_item.updated_at, cached_updated_at) == :eq do
@@ -108,7 +109,7 @@ defmodule FarmbotRes.API.Reconciler do
   # no cache available
   # If the `sync_item.updated_at` is newer than `local_item.updated_at`
   # HTTP get the data.
-  defp get_changeset(local_item, sync_item, nil) do
+  defp get_changeset(%{} = local_item, sync_item, nil) do
     # Check if remote data is newer
     if DateTime.compare(sync_item.updated_at, local_item.updated_at) == :gt do
       Logger.info(
@@ -124,7 +125,7 @@ defmodule FarmbotRes.API.Reconciler do
   # If the cache is the same `updated_at` as the API, check if the cache
   # is newer than `local_item.updated_at`
   # if the cache is not the same `updated_at` as the API, fallback to HTTP.
-  defp get_changeset(local_item, sync_item, %Changeset{} = cached) do
+  defp get_changeset(%{} = local_item, sync_item, %Changeset{} = cached) do
     cached_updated_at = Changeset.get_field(cached, :updated_at)
 
     if DateTime.compare(sync_item.updated_at, cached_updated_at) == :eq do

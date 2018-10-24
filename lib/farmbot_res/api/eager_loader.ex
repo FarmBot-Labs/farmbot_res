@@ -28,9 +28,15 @@ defmodule FarmbotRes.API.EagerLoader do
     :ok
   end
 
-  def preload(asset_module, %{id: id}) when is_atom(asset_module) do
+  def preload(asset_module, %{id: id, updated_at: precise_dt}) when is_atom(asset_module) do
     local = FarmbotRes.Repo.one(from(m in asset_module, where: m.id == ^id)) || asset_module
-    :ok = FarmbotRes.API.get_changeset(local, id) |> cache()
+
+    FarmbotRes.API.get_changeset(local, id)
+    # this is a really unfortunate hack.
+    # The API's sync object datetime data
+    # is MORE precise than that of all the end points.
+    |> asset_module.changeset(%{updated_at: precise_dt})
+    |> cache()
   end
 
   @doc "Get a Changeset by module and id. May return nil."

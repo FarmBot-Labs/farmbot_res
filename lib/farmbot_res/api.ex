@@ -56,39 +56,33 @@ defmodule FarmbotRes.API do
   end
 
   @doc "helper for `GET`ing api resources."
+  def get_changeset(asset, path)
+
+  # Hacks for dealing with these resources not having #show
   def get_changeset(FarmbotRes.Asset.FbosConfig, _),
     do: get_changeset(FarmbotRes.Asset.FbosConfig)
 
   def get_changeset(FarmbotRes.Asset.FirmwareConfig, _),
     do: get_changeset(FarmbotRes.Asset.FirmwareConfig)
 
+  def get_changeset(%FarmbotRes.Asset.FbosConfig{} = data, _),
+    do: get_changeset(data)
+
+  def get_changeset(%FarmbotRes.Asset.FirmwareConfig{} = data, _),
+    do: get_changeset(data)
+
   def get_changeset(module, path) when is_atom(module) do
     get_changeset(struct(module), path)
   end
 
-  # Delete this when #show is available on each endpoint
-  def get_changeset(%module{} = data, id) do
-    case get_body!(module.path()) do
+  def get_changeset(%module{} = data, path) do
+    get_body!(Path.join(module.path(), to_string(path)))
+    |> case do
       %{} = single ->
         module.changeset(data, single)
 
       many when is_list(many) ->
-        Enum.find_value(many, fn remote_data ->
-          if to_string(remote_data["id"]) == to_string(id) do
-            module.changeset(data, remote_data)
-          end
-        end)
+        Enum.map(many, &module.changeset(data, &1))
     end
   end
-
-  # def get_changeset(%module{} = data, path) do
-  #   get_body!(Path.join(module.path(), to_string(path)))
-  #   |> case do
-  #     %{} = single ->
-  #       module.changeset(data, single)
-
-  #     many when is_list(many) ->
-  #       Enum.map(many, &module.changeset(data, &1))
-  #   end
-  # end
 end
